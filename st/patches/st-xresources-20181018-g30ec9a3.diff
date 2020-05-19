@@ -1,19 +1,8 @@
-From 9f80f67b6238c58d2e3e209ed1c4f872d9ea7ccd Mon Sep 17 00:00:00 2001
-From: Sai Praneeth Reddy <spr.mora04@gmail.com>
-Date: Sat, 5 Jan 2019 18:13:04 +0530
-Subject: [PATCH] Update base patch to 0.8.1
-
-Read borderpx from Xresources too
----
- config.def.h | 36 ++++++++++++++++++++++++
- x.c          | 78 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 110 insertions(+), 4 deletions(-)
-
 diff --git a/config.def.h b/config.def.h
-index 823e79f..f960cac 100644
+index 823e79f..2c07b07 100644
 --- a/config.def.h
 +++ b/config.def.h
-@@ -150,6 +150,42 @@ static unsigned int mousebg = 0;
+@@ -150,6 +150,41 @@ static unsigned int mousebg = 0;
   */
  static unsigned int defaultattr = 11;
  
@@ -48,7 +37,6 @@ index 823e79f..f960cac 100644
 +		{ "blinktimeout", INTEGER, &blinktimeout },
 +		{ "bellvolume",   INTEGER, &bellvolume },
 +		{ "tabspaces",    INTEGER, &tabspaces },
-+		{ "borderpx",     INTEGER, &borderpx },
 +		{ "cwscale",      FLOAT,   &cwscale },
 +		{ "chscale",      FLOAT,   &chscale },
 +};
@@ -57,7 +45,7 @@ index 823e79f..f960cac 100644
   * Internal mouse shortcuts.
   * Beware that overloading Button1 will disable the selection.
 diff --git a/x.c b/x.c
-index 0422421..6e9b061 100644
+index 00cb6b1..3652979 100644
 --- a/x.c
 +++ b/x.c
 @@ -14,6 +14,7 @@
@@ -180,6 +168,3 @@ index 0422421..6e9b061 100644
  	cols = MAX(cols, 1);
  	rows = MAX(rows, 1);
  	tnew(cols, rows);
--- 
-2.20.1
-

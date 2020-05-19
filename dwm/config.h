@@ -16,6 +16,15 @@ static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const char *fonts[]          = { "JetBrains Mono:pixelsize=12:antialias=true:autohint=true","Symbols Nerd Font:pixelsize=12:antialias=true:autohint=true" };
 static const char dmenufont[]       = "JetBrains Mono:size=10";
+
+/* Applications */
+static const char filemanager[]     = "lf";
+static const char status_monitor[]  = "bashtop";
+static const char browser[]         = "firefox";
+static const char images[]          = "sxiv";
+static const char terminal[]        = "alacritty";
+
+/* colors */
 static char normbgcolor[]           = "#222222";
 static char normbordercolor[]       = "#444444";
 static char normfgcolor[]           = "#bbbbbb";
@@ -38,10 +47,11 @@ static const Rule rules[] = {
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+	/* { "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 }, */
 };
 
 /* layout(s) */
+
 static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
@@ -70,18 +80,47 @@ static const Layout layouts[] = {
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
-/* commands */
-static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
-static const char *termcmd[]  = { "st", NULL };
-static const char scratchpadname[] = "scratchpad";
-static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
+/* Scratchpad */
+static const char scratchpadname[]  = "scratchpad";
+static const char *scratchpadcmd[]  = { terminal, "-t", scratchpadname, "-g", "120x34", NULL };
 
+/* Dmenu */
+static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon,"-l", "8", "-b", "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
+static const char *power_menu[]     = { "power-dmenu", NULL };
+
+/* Applications */
+static const char *termcmd[]        = { terminal, NULL };
+static const char *web[]            = { browser, NULL };
+static const char *screenshot[]       = { "screenshot", NULL };
+static const char *wallview[]       = { images,"-tf","~/Pictures/Wallpapers", NULL };
+static const char *filemgr[]        = { terminal,"-e",filemanager, NULL };
+static const char *statusmtr[]      = { terminal,"-e",status_monitor, NULL };
+
+/* Volume */
+static const char *upvol[]          = { "volc", "up", NULL };
+static const char *downvol[]        = { "volc", "down", NULL };
+static const char *mutevol[]        = { "volc", "mute",  NULL };
+
+/* Brightness */
+static const char *brightup[]       = { "backlight", "up",  NULL };
+static const char *brightdown[]     = { "backlight", "down",  NULL };
+
+#include <X11/XF86keysym.h>
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-	/* { MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } }, */
-	/* { MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } }, */
+
+    /* Applications */
+	{ MODKEY,                       XK_d,      spawn,          {.v = dmenucmd } },
+	{ MODKEY,                       XK_w,      spawn,          {.v = web } },
+	{ MODKEY,                       XK_n,      spawn,          {.v = wallview } },
+	{ MODKEY,                       XK_i,      spawn,          {.v = statusmtr } },
+	{ MODKEY,                       XK_r,      spawn,          {.v = filemgr } },
+	{ MODKEY|ShiftMask,             XK_x,      spawn,          {.v = power_menu } },
+	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },
+
+    /* Dwm Bindings */
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -108,6 +147,16 @@ static Key keys[] = {
 	{ MODKEY,                       XK_Return, zoom,           {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY,                       XK_q,      killclient,     {0} },
+	{ MODKEY,                       XK_f,      fullscreen,     {0} },
+	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
+	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
+	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
+	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
+
+    /* Layouts */
 	/* { MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, */
 	/* { MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} }, */
 	/* { MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} }, */
@@ -117,16 +166,10 @@ static Key keys[] = {
 	/* { MODKEY|ShiftMask,             XK_r,      setlayout,      {.v = &layouts[6]} }, */
 	{ MODKEY,		                XK_comma,  cyclelayout,    {.i = -1 } },
 	{ MODKEY,                       XK_period, cyclelayout,    {.i = +1 } },
-	{ MODKEY,                       XK_f,      fullscreen,     {0} },
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
-	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
-	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
-	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
+
+    /* Cycling Tags */
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
@@ -136,7 +179,17 @@ static Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask,             XK_x,      quit,           {0} },
+	/* { MODKEY|ShiftMask,             XK_x,      quit,           {0} }, */
+	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
+	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
+	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
+
+    /* Function Keys */
+    { 0,                            XF86XK_AudioLowerVolume, spawn,          {.v = downvol } },
+	{ 0,                            XF86XK_AudioMute,        spawn,          {.v = mutevol } },
+	{ 0,                            XF86XK_AudioRaiseVolume, spawn,          {.v = upvol   } },
+	{ 0,                            XF86XK_MonBrightnessUp, spawn,          {.v = brightup } },
+	{ 0,                            XF86XK_MonBrightnessDown, spawn,          {.v = brightdown  } },
 };
 
 /* button definitions */
